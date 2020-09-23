@@ -69,7 +69,7 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".AmproidAuthenticatorService">
+        <service android:name=".MixerAuthenticatorService">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>
@@ -81,7 +81,7 @@
 
         <service android:name=".PresenceForever" />
 
-        <activity android:name=".AmproidMainActivity">
+        <activity android:name=".MixerMainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -92,7 +92,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".AmproidAuthenticatorActivity" />
+        <activity android:name=".MixerAuthenticatorActivity" />
 
     </application>
 
