@@ -1,25 +1,27 @@
 /*
- * This file is part of Amproid
+ * This file is part of Muizedroid's MuizenMixer
  *
- * Copyright (c) 2019. Peter Papp
+ * based upon Amproid by
  *
- * Please visit https://github.com/4phun/Amproid for details
+ *  Peter Papp
  *
- * Amproid is free software: you can redistribute it and/or modify
+ * Please visit https://github.com/ubuntpunk/muizenmixer for details
+ *
+ * Muizedroid is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Amproid is distributed in the hope that it will be useful,
+ * Muizedroid is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Amproid. If not, see http://www.gnu.org/licenses/
+ * along with Muizedroid. If not, see http://www.gnu.org/licenses/
  */
 
-package com.pppphun.amproid;
+package com.ppphun.muizedroid.mixer;
 
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -34,9 +36,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
-import static com.pppphun.amproid.Amproid.ConnectionStatus.CONNECTION_NONE;
-import static com.pppphun.amproid.Amproid.ConnectionStatus.CONNECTION_UNKNOWN;
-import static com.pppphun.amproid.AmproidService.PREFIX_ALBUM;
+import static com.pppphun.muizedroid.Mixer.ConnectionStatus.CONNECTION_NONE;
+import static com.pppphun.muizedroid.Mixer.ConnectionStatus.CONNECTION_UNKNOWN;
+import static com.pppphun.muizedroid.MixerService.PREFIX_ALBUM;
 
 
 final class AsyncGetAlbums extends AsyncTask<Void, Void, Vector<HashMap<String, String>>>
@@ -64,25 +66,25 @@ final class AsyncGetAlbums extends AsyncTask<Void, Void, Vector<HashMap<String, 
     {
         // just to be on the safe side
         if ((authToken == null) || authToken.isEmpty()) {
-            errorMessage = Amproid.getAppContext().getString(R.string.error_blank_token);
+            errorMessage = Muizedroid.getAppContext().getString(R.string.error_blank_token);
             return new Vector<>();
         }
         if ((url == null) || url.isEmpty()) {
-            errorMessage = Amproid.getAppContext().getString(R.string.error_invalid_server_url);
+            errorMessage = Muizedroid.getAppContext().getString(R.string.error_invalid_server_url);
             return new Vector<>();
         }
 
         // can't do anything without network connection
         long                     checkStart       = System.currentTimeMillis();
-        Amproid.ConnectionStatus connectionStatus = Amproid.getConnectionStatus();
+        Muizedroid.ConnectionStatus connectionStatus = Muizedroid.getConnectionStatus();
         while (!isCancelled() && ((connectionStatus == CONNECTION_UNKNOWN) || (connectionStatus == CONNECTION_NONE))) {
             Intent intent = new Intent();
             intent.putExtra("elapsedMS", System.currentTimeMillis() - checkStart);
-            Amproid.sendLocalBroadcast(R.string.async_no_network_broadcast_action, intent);
+            Muizedroid.sendLocalBroadcast(R.string.async_no_network_broadcast_action, intent);
 
             SystemClock.sleep(1000);
 
-            connectionStatus = Amproid.getConnectionStatus();
+            connectionStatus = Muizedroid.getConnectionStatus();
         }
 
         // instantiate Ampache API interface - this handles network operations and XML parsing
@@ -109,11 +111,11 @@ final class AsyncGetAlbums extends AsyncTask<Void, Void, Vector<HashMap<String, 
         ArrayList<MediaBrowserCompat.MediaItem> results = new ArrayList<>();
 
         // add root a.k.a. link to "home" as the first element
-        results.add(new MediaBrowserCompat.MediaItem(new MediaDescriptionCompat.Builder().setMediaId(Amproid.getAppContext().getString(R.string.item_root_id)).setTitle(Amproid.getAppContext().getString(R.string.item_root_desc)).build(), MediaBrowserCompat.MediaItem.FLAG_BROWSABLE));
+        results.add(new MediaBrowserCompat.MediaItem(new MediaDescriptionCompat.Builder().setMediaId(Muizedroid.getAppContext().getString(R.string.item_root_id)).setTitle(Muizedroid.getAppContext().getString(R.string.item_root_desc)).build(), MediaBrowserCompat.MediaItem.FLAG_BROWSABLE));
 
         if (!errorMessage.isEmpty()) {
             // add another link to "home" with the error message
-            results.add(new MediaBrowserCompat.MediaItem(new MediaDescriptionCompat.Builder().setMediaId(Amproid.getAppContext().getString(R.string.item_root_id)).setTitle(errorMessage).build(), MediaBrowserCompat.MediaItem.FLAG_BROWSABLE));
+            results.add(new MediaBrowserCompat.MediaItem(new MediaDescriptionCompat.Builder().setMediaId(Muizedroid.getAppContext().getString(R.string.item_root_id)).setTitle(errorMessage).build(), MediaBrowserCompat.MediaItem.FLAG_BROWSABLE));
         }
 
         // add all resulting albums
@@ -131,13 +133,13 @@ final class AsyncGetAlbums extends AsyncTask<Void, Void, Vector<HashMap<String, 
         // let everyone know if there was a problem
         if (defective > 0) {
             // yet another link to home
-            results.add(new MediaBrowserCompat.MediaItem(new MediaDescriptionCompat.Builder().setMediaId(Amproid.getAppContext().getString(R.string.item_root_id)).setTitle(String.format(Amproid.getAppContext().getString(R.string.error_defective_albums), defective)).build(), MediaBrowserCompat.MediaItem.FLAG_BROWSABLE));
+            results.add(new MediaBrowserCompat.MediaItem(new MediaDescriptionCompat.Builder().setMediaId(Muizedroid.getAppContext().getString(R.string.item_root_id)).setTitle(String.format(Muizedroid.getAppContext().getString(R.string.error_defective_albums), defective)).build(), MediaBrowserCompat.MediaItem.FLAG_BROWSABLE));
         }
 
         // send it back to the media browser service
         resultToSend.sendResult(results);
 
-        // for AmproidService to update position
-        Amproid.sendLocalBroadcast(R.string.async_finished_broadcast_action, null);
+        // for MuizedroidService to update position
+        Mixer.sendLocalBroadcast(R.string.async_finished_broadcast_action, null);
     }
 }

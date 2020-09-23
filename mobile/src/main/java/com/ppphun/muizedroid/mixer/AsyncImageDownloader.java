@@ -1,25 +1,27 @@
 /*
- * This file is part of Amproid
+ * This file is part of Muizedroid's MuizenMixer
  *
- * Copyright (c) 2019. Peter Papp
+ * based upon Amproid
  *
- * Please visit https://github.com/4phun/Amproid for details
+ by Peter Papp
  *
- * Amproid is free software: you can redistribute it and/or modify
+ * Please visit https://github.com/ubuntupunk/muizenmixer for details
+ *
+ * Muizedroid is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Amproid is distributed in the hope that it will be useful,
+ * Muizedroid is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Amproid. If not, see http://www.gnu.org/licenses/
+ * along with Muizedroid. If not, see http://www.gnu.org/licenses/
  */
 
-package com.pppphun.amproid;
+package com.ppphun.muizedroid.mixer;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -72,9 +74,9 @@ final class AsyncImageDownloader extends AsyncTask<Void, Void, Bitmap>
 
         // send IPC to our service
         final Intent intent = new Intent();
-        intent.putExtra(Amproid.getAppContext().getString(R.string.async_finished_broadcast_type), Amproid.getAppContext().getResources().getInteger(R.integer.async_image_downloader));
+        intent.putExtra(Mixer.getAppContext().getString(R.string.async_finished_broadcast_type), Mixer.getAppContext().getResources().getInteger(R.integer.async_image_downloader));
         intent.putExtra("image", bitmap);
         intent.putExtra("url", url.toString());
-        Amproid.sendLocalBroadcast(R.string.async_finished_broadcast_action, intent);
+        Mixer.sendLocalBroadcast(R.string.async_finished_broadcast_action, intent);
     }
 }

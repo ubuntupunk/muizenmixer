@@ -1,26 +1,26 @@
 /*
- * This file is part of Amproid
+ * This file is part of Muizedroid's Muizenmixer
  *
- * Copyright (c) 2019. Peter Papp
+ * based upon Ampdroid by Peter Papp
  *
- * Please visit https://github.com/4phun/Amproid for details
+ * Please visit https://github.com/ubuntpunk/muizenmixer for details
  *
- * Amproid is free software: you can redistribute it and/or modify
+ * Muizedroid is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Amproid is distributed in the hope that it will be useful,
+ * Muizedroid is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Amproid. If not, see http://www.gnu.org/licenses/
+ * along with Muizedroid. If not, see http://www.gnu.org/licenses/
  */
 
 
-package com.pppphun.amproid;
+package com.ppphun.muizedroid.mixer;
 
 import android.accounts.AbstractAccountAuthenticator;
 import android.accounts.Account;
@@ -37,12 +37,12 @@ import static android.accounts.AccountManager.KEY_ERROR_CODE;
 import static android.accounts.AccountManager.KEY_ERROR_MESSAGE;
 
 
-public class AmproidAuthenticator extends AbstractAccountAuthenticator
+public class MixerAuthenticator extends AbstractAccountAuthenticator
 {
     private final Context context;
 
 
-    AmproidAuthenticator(Context context)
+    MixerAuthenticator(Context context)
     {
         super(context);
         this.context = context;
@@ -61,11 +61,11 @@ public class AmproidAuthenticator extends AbstractAccountAuthenticator
     {
         Bundle returnValue = new Bundle();
 
-        // create intent to open the authenticator activity, see also AmproidService's AmproidAccountManagerCallback class
-        final Intent intent = new Intent(context, AmproidAuthenticatorActivity.class);
+        // create intent to open the authenticator activity, see also MixerService's MixerAccountManagerCallback class
+        final Intent intent = new Intent(context, MixerAuthenticatorActivity.class);
         intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
         intent.putExtra(KEY_ACCOUNT_TYPE, accountType);
-        intent.putExtra("AmproidAuthenticatorActivity", true);
+        intent.putExtra("MixerAuthenticatorActivity", true);
         intent.putExtra("add_new", true);
 
         returnValue.putParcelable(AccountManager.KEY_INTENT, intent);

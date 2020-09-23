@@ -1,26 +1,26 @@
 /*
- * This file is part of Amproid
+ * This file is part of Muizedroid's MuizenMixer
  *
- * Copyright (c) 2019. Peter Papp
+ *based upon Amproid by Peter Papp
  *
- * Please visit https://github.com/4phun/Amproid for details
+ * Please visit https://github.com/ubuntupunk/muizenmixer for details
  *
- * Amproid is free software: you can redistribute it and/or modify
+ * Muizedroid is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Amproid is distributed in the hope that it will be useful,
+ * Muizedroid is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Amproid. If not, see http://www.gnu.org/licenses/
+ * along with Muizdroid. If not, see http://www.gnu.org/licenses/
  */
 
 
-package com.pppphun.amproid;
+package com.ppphun.muizedroid.mixer;
 
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
@@ -47,7 +47,7 @@ import static android.accounts.AccountManager.KEY_ACCOUNT_NAME;
 import static android.accounts.AccountManager.KEY_ACCOUNT_TYPE;
 
 
-public class AmproidAuthenticatorActivity extends AccountAuthenticatorActivity
+public class MixerAuthenticatorActivity extends AccountAuthenticatorActivity
 {
     @SuppressWarnings ("rawtypes")
     private ArrayAdapter accountItems = null;   // accounts in account selector drop-down
@@ -124,9 +124,9 @@ public class AmproidAuthenticatorActivity extends AccountAuthenticatorActivity
                 setAccountAuthenticatorResult(intent.getExtras());
                 setResult(RESULT_OK, intent);
 
-                // send broadcast too, this will be caught by the main Amproid service
+                // send broadcast too, this will be caught by the main Muizedroid service
                 // this is necessary because services can not do "startActivityForResult", also they must start activities with FLAG_ACTIVITY_NEW_TASK flag on
-                Amproid.sendLocalBroadcast(R.string.account_selected_broadcast_action, intent);
+                Mixer.sendLocalBroadcast(R.string.account_selected_broadcast_action, intent);
 
                 // OK now we're done for good
                 finish();

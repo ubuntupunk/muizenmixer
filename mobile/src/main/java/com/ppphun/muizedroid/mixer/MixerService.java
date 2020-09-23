@@ -1,26 +1,28 @@
 /*
- * This file is part of Amproid
+ * This file is part of Muizendroid's MuizenMixer
  *
- * Copyright (c) 2019. Peter Papp
+ * based upon Amproid by
  *
- * Please visit https://github.com/4phun/Amproid for details
+ *Peter Papp
  *
- * Amproid is free software: you can redistribute it and/or modify
+ * Please visit https://github.com/4phun/Muizendroid for details
+ *
+ * Muizendroid is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Amproid is distributed in the hope that it will be useful,
+ * Muizendroid is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Amproid. If not, see http://www.gnu.org/licenses/
+ * along with Muizendroid. If not, see http://www.gnu.org/licenses/
  */
 
 
-package com.pppphun.amproid;
+package com.ppphun.muizedroid.mixer;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -96,11 +98,11 @@ import static android.support.v4.media.session.PlaybackStateCompat.STATE_CONNECT
 import static android.support.v4.media.session.PlaybackStateCompat.STATE_PAUSED;
 import static android.support.v4.media.session.PlaybackStateCompat.STATE_PLAYING;
 import static android.support.v4.media.session.PlaybackStateCompat.STATE_STOPPED;
-import static com.pppphun.amproid.Amproid.bundleGetString;
-import static com.pppphun.amproid.Amproid.sendLocalBroadcast;
+import static com.pppphun.muizedroid.Muizedroid.bundleGetString;
+import static com.pppphun.muizedroid.Muizedroid.sendLocalBroadcast;
 
 
-public class AmproidService extends MediaBrowserServiceCompat
+public class MixerService extends MediaBrowserServiceCompat
 {
     // miscellaneous package-wide constants
     final static int LOUDNESS_GAIN_DEFAULT = 300;
@@ -120,7 +122,7 @@ public class AmproidService extends MediaBrowserServiceCompat
 
     // miscellaneous constants
     private final static int    NOTIFICATION_ID         = 1001;
-    private final static String NOTIFICATION_CHANNEL_ID = "AmproidServiceNotificationChannel";
+    private final static String NOTIFICATION_CHANNEL_ID = "MuizedroidServiceNotificationChannel";
 
     // attempts
     private final static int MAX_AUTH_ATTEMPTS = 50;
@@ -140,13 +142,13 @@ public class AmproidService extends MediaBrowserServiceCompat
     private NotificationManagerCompat  notificationManager = null;
 
     // for playing tracks
-    private AmproidMediaPlayer mediaPlayer = null;
+    private MuizedroidMediaPlayer mediaPlayer = null;
 
     // to handle audio focus
     private AudioManager.OnAudioFocusChangeListener audioFocusChangeListener = null;
 
     // IPC with this project's activities
-    private AmproidBroacastReceiver amproidBroacastReceiver = new AmproidBroacastReceiver();
+    private MuizedroidBroacastReceiver muizedroidBroacastReceiver = new MuizedroidBroacastReceiver();
 
     // fields to support connection with Ampache server
     private int     authAttempts    = 0;
@@ -181,7 +183,7 @@ public class AmproidService extends MediaBrowserServiceCompat
         public void run()
         {
             fakeTrackMessage(R.string.login_handshake, selectedAccount.name);
-            AccountManager.get(AmproidService.this).getAuthToken(selectedAccount, "", null, true, new AmproidService.AmproidAccountManagerCallback(), null);
+            AccountManager.get(MixerService.this).getAuthToken(selectedAccount, "", null, true, new MixerService.MuizedroidAccountManagerCallback(), null);
         }
     };
     private Runnable delayedQuit                                        = new Runnable()
@@ -303,7 +305,7 @@ public class AmproidService extends MediaBrowserServiceCompat
         }
 
         // get the Ampache server's URL from the account
-        String serverUrl = Amproid.getServerUrl(selectedAccount);
+        String serverUrl = Muizedroid.getServerUrl(selectedAccount);
 
         // set state to "connecting" before starting network operations so clients can display hourglass or some other visual cue
         stateBuilder.setState(STATE_CONNECTING, 0, 0);
@@ -357,7 +359,7 @@ public class AmproidService extends MediaBrowserServiceCompat
             extras.putString("query", query);
         }
 
-        asyncTasks.add(new AsyncSearch(authToken, Amproid.getServerUrl(selectedAccount), extras, result).execute());
+        asyncTasks.add(new AsyncSearch(authToken, Muizedroid.getServerUrl(selectedAccount), extras, result).execute());
     }
 
 
@@ -402,8 +404,8 @@ public class AmproidService extends MediaBrowserServiceCompat
 
         try {
             // unregister IPC receiver
-            LocalBroadcastManager.getInstance(this).unregisterReceiver(amproidBroacastReceiver);
-            unregisterReceiver(amproidBroacastReceiver);
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(MuizedroidBroacastReceiver);
+            unregisterReceiver(MuizedroidBroacastReceiver);
         }
         catch (Exception e) {
             // nothing to do here
@@ -527,7 +529,7 @@ public class AmproidService extends MediaBrowserServiceCompat
                 trackIndex = playlistIndex;
             }
             else {
-                // this could happen if playlist is modified on Ampache server between Amproid restarts
+                // this could happen if playlist is modified on Ampache server between Muizedroid restarts
                 playlistIndex = trackIndex;
             }
         }
@@ -708,7 +710,7 @@ public class AmproidService extends MediaBrowserServiceCompat
         mediaSession.setPlaybackState(stateBuilder.build());
 
         // get track, this will start play too
-        asyncTasks.add(new AsyncGetTracks(authToken, Amproid.getServerUrl(selectedAccount), playMode, ampacheId).execute());
+        asyncTasks.add(new AsyncGetTracks(authToken, Muizedroid.getServerUrl(selectedAccount), playMode, ampacheId).execute());
     }
 
 
@@ -754,7 +756,7 @@ public class AmproidService extends MediaBrowserServiceCompat
             mediaPlayer = null;
         }
 
-        mediaPlayer = new AmproidMediaPlayer(track, !pausedByUser);
+        mediaPlayer = new MuizedroidMediaPlayer(track, !pausedByUser);
     }
 
 
@@ -875,17 +877,17 @@ public class AmproidService extends MediaBrowserServiceCompat
     private void startAuth()
     {
         // accounts are managed by Android's built-in Accounts settings
-        // an Amproid account is essentially the URL and credentials to any Ampache server
+        // an Muizedroid account is essentially the URL and credentials to any Ampache server
         // the goal here is to find an account to use
 
-        // get all Amproid accounts
+        // get all Muizedroid accounts
         final AccountManager accountManager = AccountManager.get(this);
         Account[]            accounts       = accountManager.getAccountsByType(getString(R.string.account_type));
 
         // no account exist - user must create at least one
         if (accounts.length == 0) {
             // this eventually will open the authenticator activity (which, in turn, should result in returning to this startAuth method again, unless the user cancels)
-            accountManager.addAccount(getString(R.string.account_type), null, null, null, null, new AmproidAccountManagerCallback(), null);
+            accountManager.addAccount(getString(R.string.account_type), null, null, null, null, new MuizedroidAccountManagerCallback(), null);
             return;
         }
 
@@ -934,7 +936,7 @@ public class AmproidService extends MediaBrowserServiceCompat
     // this is just a simple helper to open the authenticator activity
     private void startAuthenticatorActivity()
     {
-        final Intent intent = new Intent(this, AmproidAuthenticatorActivity.class);
+        final Intent intent = new Intent(this, MuizedroidAuthenticatorActivity.class);
         intent.putExtra(KEY_ACCOUNT_TYPE, getString(R.string.account_type));
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
@@ -949,21 +951,21 @@ public class AmproidService extends MediaBrowserServiceCompat
         public void run()
         {
             // initialize handler of incoming IPC messages
-            registerReceiver(amproidBroacastReceiver, new IntentFilter("android.media.AUDIO_BECOMING_NOISY"));
-            LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(AmproidService.this);
-            localBroadcastManager.registerReceiver(amproidBroacastReceiver, new IntentFilter(getString(R.string.account_selected_broadcast_action)));
-            localBroadcastManager.registerReceiver(amproidBroacastReceiver, new IntentFilter(getString(R.string.async_finished_broadcast_action)));
-            localBroadcastManager.registerReceiver(amproidBroacastReceiver, new IntentFilter(getString(R.string.async_no_network_broadcast_action)));
-            localBroadcastManager.registerReceiver(amproidBroacastReceiver, new IntentFilter(getString(R.string.eq_request_broadcast_action)));
-            localBroadcastManager.registerReceiver(amproidBroacastReceiver, new IntentFilter(getString(R.string.eq_apply_broadcast_action)));
-            localBroadcastManager.registerReceiver(amproidBroacastReceiver, new IntentFilter(getString(R.string.playlist_request_broadcast_action)));
-            localBroadcastManager.registerReceiver(amproidBroacastReceiver, new IntentFilter(getString(R.string.playlist_apply_broadcast_action)));
+            registerReceiver(muizedroidBroacastReceiver, new IntentFilter("android.media.AUDIO_BECOMING_NOISY"));
+            LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(MixerService.this);
+            localBroadcastManager.registerReceiver(muizedroidBroacastReceiver, new IntentFilter(getString(R.string.account_selected_broadcast_action)));
+            localBroadcastManager.registerReceiver(muizedroidBroacastReceiver, new IntentFilter(getString(R.string.async_finished_broadcast_action)));
+            localBroadcastManager.registerReceiver(muizedroidBroacastReceiver, new IntentFilter(getString(R.string.async_no_network_broadcast_action)));
+            localBroadcastManager.registerReceiver(muizedroidBroacastReceiver, new IntentFilter(getString(R.string.eq_request_broadcast_action)));
+            localBroadcastManager.registerReceiver(muizedroidBroacastReceiver, new IntentFilter(getString(R.string.eq_apply_broadcast_action)));
+            localBroadcastManager.registerReceiver(muizedroidBroacastReceiver, new IntentFilter(getString(R.string.playlist_request_broadcast_action)));
+            localBroadcastManager.registerReceiver(muizedroidBroacastReceiver, new IntentFilter(getString(R.string.playlist_apply_broadcast_action)));
 
             // Uri of custom notification sound
             Uri notifyUri = Uri.parse(String.format("%s://%s/%s", ContentResolver.SCHEME_ANDROID_RESOURCE, getApplicationContext().getPackageName(), R.raw.notify));
 
             // notification manager will be used to update notification with track data
-            notificationManager = NotificationManagerCompat.from(AmproidService.this);
+            notificationManager = NotificationManagerCompat.from(MixerService.this);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, getString(R.string.app_name), NotificationManager.IMPORTANCE_HIGH);
                 notificationChannel.setLockscreenVisibility(NotificationCompat.VISIBILITY_PUBLIC);
@@ -972,21 +974,21 @@ public class AmproidService extends MediaBrowserServiceCompat
             }
 
             // create and initialize notification builder
-            notificationBuilder = new NotificationCompat.Builder(AmproidService.this, NOTIFICATION_CHANNEL_ID)
-                    .addAction(new NotificationCompat.Action(android.R.drawable.ic_media_play, getString(R.string.play), MediaButtonReceiver.buildMediaButtonPendingIntent(AmproidService.this, ACTION_PLAY)))
-                    .addAction(new NotificationCompat.Action(android.R.drawable.ic_media_pause, getString(R.string.pause), MediaButtonReceiver.buildMediaButtonPendingIntent(AmproidService.this, ACTION_PAUSE)))
-                    .addAction(new NotificationCompat.Action(android.R.drawable.ic_media_next, getString(R.string.next), MediaButtonReceiver.buildMediaButtonPendingIntent(AmproidService.this, ACTION_SKIP_TO_NEXT)))
-                    .addAction(new NotificationCompat.Action(android.R.drawable.ic_menu_close_clear_cancel, getString(R.string.stop), MediaButtonReceiver.buildMediaButtonPendingIntent(AmproidService.this, ACTION_STOP)))
+            notificationBuilder = new NotificationCompat.Builder(MixerService.this, NOTIFICATION_CHANNEL_ID)
+                    .addAction(new NotificationCompat.Action(android.R.drawable.ic_media_play, getString(R.string.play), MediaButtonReceiver.buildMediaButtonPendingIntent(MixerService.this, ACTION_PLAY)))
+                    .addAction(new NotificationCompat.Action(android.R.drawable.ic_media_pause, getString(R.string.pause), MediaButtonReceiver.buildMediaButtonPendingIntent(MixerService.this, ACTION_PAUSE)))
+                    .addAction(new NotificationCompat.Action(android.R.drawable.ic_media_next, getString(R.string.next), MediaButtonReceiver.buildMediaButtonPendingIntent(MixerService.this, ACTION_SKIP_TO_NEXT)))
+                    .addAction(new NotificationCompat.Action(android.R.drawable.ic_menu_close_clear_cancel, getString(R.string.stop), MediaButtonReceiver.buildMediaButtonPendingIntent(MixerService.this, ACTION_STOP)))
                     .setContentText(getString(R.string.initializing))
                     .setContentTitle(getString(R.string.app_name))
-                    .setSmallIcon(R.drawable.amproid_playing)
-                    .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.amproid_playing))
+                    .setSmallIcon(R.drawable.muizedroid_playing)
+                    .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.muizedroid_playing))
                     .setOngoing(true)
                     .setOnlyAlertOnce(true)
                     .setPriority(Notification.PRIORITY_HIGH)
                     .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                     .setSound(notifyUri)
-                    .setStyle(new androidx.media.app.NotificationCompat.MediaStyle().setMediaSession(mediaSession.getSessionToken()).setShowCancelButton(true).setCancelButtonIntent(MediaButtonReceiver.buildMediaButtonPendingIntent(AmproidService.this, ACTION_STOP)).setShowActionsInCompactView(0, 1));
+                    .setStyle(new androidx.media.app.NotificationCompat.MediaStyle().setMediaSession(mediaSession.getSessionToken()).setShowCancelButton(true).setCancelButtonIntent(MediaButtonReceiver.buildMediaButtonPendingIntent(MixerService.this, ACTION_STOP)).setShowActionsInCompactView(0, 1));
 
             // put this media browser service in the foreground
             startForeground(NOTIFICATION_ID, notificationBuilder.build());
@@ -1002,7 +1004,7 @@ public class AmproidService extends MediaBrowserServiceCompat
                     equalizerSettings = new Equalizer.Settings(equalizerSettingsString);
                 }
                 catch (Exception e) {
-                    // nothing to do here, equalizerSettings remains null, which is handled in AmproidMediaPLayer's setEffects
+                    // nothing to do here, equalizerSettings remains null, which is handled in MuizedroidMediaPLayer's setEffects
                 }
             }
 
@@ -1095,7 +1097,7 @@ public class AmproidService extends MediaBrowserServiceCompat
         @Override
         public void onPlayFromMediaId(String mediaId, Bundle extras)
         {
-            String serverUrl = Amproid.getServerUrl(selectedAccount);
+            String serverUrl = Muizedroid.getServerUrl(selectedAccount);
 
             // set state to "connecting" before starting network operations so clients can display hourglass or some other visual cue
             stateBuilder.setState(STATE_CONNECTING, 0, 0);
@@ -1177,7 +1179,7 @@ public class AmproidService extends MediaBrowserServiceCompat
             }
 
             // start search
-            asyncTasks.add(new AsyncSearch(authToken, Amproid.getServerUrl(selectedAccount), extras).execute());
+            asyncTasks.add(new AsyncSearch(authToken, Muizedroid.getServerUrl(selectedAccount), extras).execute());
         }
 
 
@@ -1221,7 +1223,7 @@ public class AmproidService extends MediaBrowserServiceCompat
             mediaSession.setPlaybackState(stateBuilder.build());
 
             // start asynchronous task that gets a track from Ampache server
-            asyncTasks.add(new AsyncGetTracks(authToken, Amproid.getServerUrl(selectedAccount), playMode, playlistId).execute());
+            asyncTasks.add(new AsyncGetTracks(authToken, Muizedroid.getServerUrl(selectedAccount), playMode, playlistId).execute());
         }
 
 
@@ -1274,8 +1276,8 @@ public class AmproidService extends MediaBrowserServiceCompat
     }
 
 
-    // this receives callbacks from Android's Account settings, which effectively means the AmproidAuthenticator class in this project
-    private final class AmproidAccountManagerCallback implements AccountManagerCallback<Bundle>
+    // this receives callbacks from Android's Account settings, which effectively means the MuizedroidAuthenticator class in this project
+    private final class MuizedroidAccountManagerCallback implements AccountManagerCallback<Bundle>
     {
         @Override
         public void run(AccountManagerFuture<Bundle> future)
@@ -1298,7 +1300,7 @@ public class AmproidService extends MediaBrowserServiceCompat
 
                 // authenticator wants to open the "add account" dialog
                 // noinspection ConstantConditions - never null because it was checked with "containsKey"
-                if (intent.getBooleanExtra("AmproidAuthenticatorActivity", false)) {
+                if (intent.getBooleanExtra("MuizedroidAuthenticatorActivity", false)) {
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                 }
@@ -1331,14 +1333,14 @@ public class AmproidService extends MediaBrowserServiceCompat
                 }
 
                 // this checks if token is valid, which needs to be checked because AccountManager caches it
-                asyncTasks.add(new AsyncValidateToken(authToken, Amproid.getServerUrl(selectedAccount)).execute());
+                asyncTasks.add(new AsyncValidateToken(authToken, Muizedroid.getServerUrl(selectedAccount)).execute());
             }
         }
     }
 
 
     // IPC receiver
-    private final class AmproidBroacastReceiver extends BroadcastReceiver
+    private final class MuizedroidBroacastReceiver extends BroadcastReceiver
     {
         @SuppressLint ("ApplySharedPref")
         @Override
@@ -1503,7 +1505,7 @@ public class AmproidService extends MediaBrowserServiceCompat
                         preferencesEditor.commit();
                     }
                     catch (Exception e) {
-                        // nothing to do here, equalizerSettings remains unchanged, null is handled in AmproidMediaPlayer's setEffects
+                        // nothing to do here, equalizerSettings remains unchanged, null is handled in MuizedroidMediaPlayer's setEffects
                     }
                 }
 
@@ -1546,7 +1548,7 @@ public class AmproidService extends MediaBrowserServiceCompat
 
 
     // simple subclass of MediaPlayer so that it also keeps mediaSession state up to date
-    private final class AmproidMediaPlayer extends MediaPlayer
+    private final class MuizedroidMediaPlayer extends MediaPlayer
     {
         private static final int EQ_PRIORITY                = 9;
         private static final int SESSION_POS_UPDATE_SECONDS = 5;
@@ -1573,7 +1575,7 @@ public class AmproidService extends MediaBrowserServiceCompat
 
 
         // constructor
-        AmproidMediaPlayer(Track track, final boolean autoStart)
+        MuizedroidMediaPlayer(Track track, final boolean autoStart)
         {
             super();
 
@@ -1607,7 +1609,7 @@ public class AmproidService extends MediaBrowserServiceCompat
                         mediaSessionUpdateDurationPositionIfPlaying();
                     }
 
-                    if (AmproidMediaPlayer.this.track.isDoFade() && !sought && (fadeDirection == FADE_DIRECTION_NONE) && (position >= (duration - FADE_DURATION - 1000))) {
+                    if (MixerService.MuizedroidMediaPlayer.this.track.isDoFade() && !sought && (fadeDirection == FADE_DIRECTION_NONE) && (position >= (duration - FADE_DURATION - 1000))) {
                         fadeDirection = FADE_DIRECTION_OUT;
                         fadeValue     = 1.0f;
                         startFade();
@@ -1633,7 +1635,7 @@ public class AmproidService extends MediaBrowserServiceCompat
                     }
 
                     // also get the art
-                    asyncTasks.add(new AsyncImageDownloader(AmproidMediaPlayer.this.track.getPictureUrl()).execute());
+                    asyncTasks.add(new AsyncImageDownloader(MixerService.MuizedroidMediaPlayer.this.track.getPictureUrl()).execute());
                 }
             });
 
@@ -1734,7 +1736,7 @@ public class AmproidService extends MediaBrowserServiceCompat
 
             // set data source with additional validation of the URL
             try {
-                setDataSource(AmproidService.this, Uri.parse(track.getUrl().toString()));
+                setDataSource(MixerService.this, Uri.parse(track.getUrl().toString()));
             }
             catch (Exception e) {
                 fakeTrackMessage(R.string.error_set_data_source_error, e.getMessage());

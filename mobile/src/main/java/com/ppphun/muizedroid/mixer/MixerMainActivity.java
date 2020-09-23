@@ -1,26 +1,28 @@
 /*
- * This file is part of Amproid
+ * This file is part of Muizedroid's MuizenMixer
  *
- * Copyright (c) 2019. Peter Papp
+ * based upon Amproid
+ *
+ *by Peter Papp
  *
  * Please visit https://github.com/4phun/Amproid for details
  *
- * Amproid is free software: you can redistribute it and/or modify
+ * Muizedroid is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Amproid is distributed in the hope that it will be useful,
+ * Muizedroid is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Amproid. If not, see http://www.gnu.org/licenses/
+ * along with Muizedroid. If not, see http://www.gnu.org/licenses/
  */
 
 
-package com.pppphun.amproid;
+package com.ppphun.muizedroid.mixer;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -95,7 +97,7 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static android.widget.LinearLayout.HORIZONTAL;
 
 
-public class AmproidMainActivity extends AppCompatActivity
+public class MixerMainActivity extends AppCompatActivity
 {
     private MediaBrowserCompat mediaBrowser;
 
@@ -131,7 +133,7 @@ public class AmproidMainActivity extends AppCompatActivity
         LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, new IntentFilter(getString(R.string.playlist_values_broadcast_action)));
         LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, new IntentFilter(getString(R.string.quit_broadcast_action)));
 
-        Intent intentAmproidService = new Intent(this, AmproidService.class);
+        Intent intentAmproidService = new Intent(this, MixerService.class);
 
         Intent intentMain = getIntent();
 
@@ -152,7 +154,7 @@ public class AmproidMainActivity extends AppCompatActivity
             togglePresenceForever(true);
         }
 
-        mediaBrowser = new MediaBrowserCompat(this, new ComponentName(this, AmproidService.class), new ConnectionCallback(), null);
+        mediaBrowser = new MediaBrowserCompat(this, new ComponentName(this, MixerService.class), new ConnectionCallback(), null);
 
         mediaUIValuesCache = new MediaUIValuesCache();
 
@@ -215,7 +217,7 @@ public class AmproidMainActivity extends AppCompatActivity
                 // image won't be as big as the screen inside a dialog of course, but the point is to ask Android to make it as big as possible
                 int desiredMinSize = Math.min(mediaUIValuesCache.screenWidth, mediaUIValuesCache.displayMetrics.heightPixels);
 
-                ImageView artView = new ImageView(AmproidMainActivity.this);
+                ImageView artView = new ImageView(MixerMainActivity.this);
 
                 artView.setMinimumWidth(desiredMinSize);
                 artView.setMinimumHeight(desiredMinSize);
@@ -224,7 +226,7 @@ public class AmproidMainActivity extends AppCompatActivity
                 artView.setScaleType(ImageView.ScaleType.FIT_CENTER);
                 artView.setImageDrawable(art.getDrawable());
 
-                AlertDialog.Builder artDialogBuilder = new AlertDialog.Builder(AmproidMainActivity.this).setTitle(R.string.art).setView(artView).setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
+                AlertDialog.Builder artDialogBuilder = new AlertDialog.Builder(MixerMainActivity.this).setTitle(R.string.art).setView(artView).setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
                 {
                     @Override
                     public void onClick(DialogInterface dialog, int which)
@@ -262,7 +264,7 @@ public class AmproidMainActivity extends AppCompatActivity
             public void run()
             {
                 boolean inc;
-                synchronized (AmproidMainActivity.this) {
+                synchronized (MixerMainActivity.this) {
                     inc = increasePosition;
                 }
 
@@ -330,7 +332,7 @@ public class AmproidMainActivity extends AppCompatActivity
         licenseText.setMovementMethod(LinkMovementMethod.getInstance());
 
         // build the dialog
-        AlertDialog.Builder aboutDialogBuilder = new AlertDialog.Builder(AmproidMainActivity.this).setTitle(title).setView(view).setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
+        AlertDialog.Builder aboutDialogBuilder = new AlertDialog.Builder(MixerMainActivity.this).setTitle(title).setView(view).setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
         {
             @Override
             public void onClick(DialogInterface dialog, int which)
@@ -346,7 +348,7 @@ public class AmproidMainActivity extends AppCompatActivity
 
     public void menuAccount(MenuItem menuItem)
     {
-        final Intent intent = new Intent(this, AmproidAuthenticatorActivity.class);
+        final Intent intent = new Intent(this, MixerAuthenticatorActivity.class);
         intent.putExtra(KEY_ACCOUNT_TYPE, getString(R.string.account_type));
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
@@ -365,7 +367,7 @@ public class AmproidMainActivity extends AppCompatActivity
     {
         final SharedPreferences preferences = getSharedPreferences(getString(R.string.options_preferences), Context.MODE_PRIVATE);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(AmproidMainActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(MixerMainActivity.this);
         builder.setTitle(R.string.options);
 
         View view = getLayoutInflater().inflate(R.layout.dialog_options, null);
@@ -500,7 +502,7 @@ public class AmproidMainActivity extends AppCompatActivity
 
             MediaControllerCompat mediaController = null;
             try {
-                mediaController = new MediaControllerCompat(AmproidMainActivity.this, token);
+                mediaController = new MediaControllerCompat(MixerMainActivity.this, token);
             }
             catch (RemoteException e) {
                 // nothing to do here, mediaController remains null, this is handled below
@@ -509,7 +511,7 @@ public class AmproidMainActivity extends AppCompatActivity
             if (mediaController != null) {
                 mediaController.registerCallback(new ControllerCallback());
 
-                MediaControllerCompat.setMediaController(AmproidMainActivity.this, mediaController);
+                MediaControllerCompat.setMediaController(MixerMainActivity.this, mediaController);
 
                 findViewById(R.id.playButton).setOnClickListener(new View.OnClickListener()
                 {
@@ -578,7 +580,7 @@ public class AmproidMainActivity extends AppCompatActivity
                     {
                         final MediaController mediaController = getMediaController();
                         if (mediaController != null) {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(AmproidMainActivity.this);
+                            AlertDialog.Builder builder = new AlertDialog.Builder(MixerMainActivity.this);
                             builder.setTitle(R.string.search);
 
                             View view = getLayoutInflater().inflate(R.layout.dialog_search, null);
@@ -593,7 +595,7 @@ public class AmproidMainActivity extends AppCompatActivity
                                 {
                                     String query = searchInput.getText() == null ? "" : searchInput.getText().toString().trim();
                                     if (query.length() < 3) {
-                                        Toast.makeText(AmproidMainActivity.this, R.string.error_searchinput_insufficient, Toast.LENGTH_LONG).show();
+                                        Toast.makeText(MixerMainActivity.this, R.string.error_searchinput_insufficient, Toast.LENGTH_LONG).show();
                                         return;
                                     }
                                     mediaBrowser.search(query, new Bundle(), new MediaSearchCallback());
@@ -607,7 +609,7 @@ public class AmproidMainActivity extends AppCompatActivity
                                 {
                                     String query = searchInput.getText() == null ? "" : searchInput.getText().toString().trim();
                                     if (query.length() < 3) {
-                                        Toast.makeText(AmproidMainActivity.this, R.string.error_searchinput_insufficient, Toast.LENGTH_LONG).show();
+                                        Toast.makeText(MixerMainActivity.this, R.string.error_searchinput_insufficient, Toast.LENGTH_LONG).show();
                                         return;
                                     }
                                     mediaController.getTransportControls().playFromSearch(query, new Bundle());
@@ -878,7 +880,7 @@ public class AmproidMainActivity extends AppCompatActivity
             LinearLayout.LayoutParams rowLayoutParams = new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT);
             rowLayoutParams.setMargins(0, 0, 0, Math.round(getResources().getDimension(R.dimen.distance_between)));
 
-            LinearLayout row = new LinearLayout(AmproidMainActivity.this);
+            LinearLayout row = new LinearLayout(MixerMainActivity.this);
             row.setOrientation(HORIZONTAL);
             row.setLayoutParams(rowLayoutParams);
             row.setPadding(mediaUIValuesCache.sidePadding, mediaUIValuesCache.topBottomPadding, mediaUIValuesCache.sidePadding, mediaUIValuesCache.topBottomPadding);
@@ -1049,7 +1051,7 @@ public class AmproidMainActivity extends AppCompatActivity
                 }
 
                 // get loudness gain
-                int loudnessGain = extras.getInt(getString(R.string.eq_broadcast_key_loudness_gain), AmproidService.LOUDNESS_GAIN_DEFAULT);
+                int loudnessGain = extras.getInt(getString(R.string.eq_broadcast_key_loudness_gain), MixerService.LOUDNESS_GAIN_DEFAULT);
 
                 // these will be needed when constructing return value
                 eqNumBands = equalizerSettings.numBands;
@@ -1059,7 +1061,7 @@ public class AmproidMainActivity extends AppCompatActivity
                 short maxLevel = extras.getShort(getString(R.string.eq_broadcast_key_max), (short) 0);
 
                 // create dialog instance
-                AlertDialog.Builder builder = new AlertDialog.Builder(AmproidMainActivity.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(MixerMainActivity.this);
                 builder.setTitle(R.string.equalizer);
 
                 // build UI from layout XML
@@ -1102,12 +1104,12 @@ public class AmproidMainActivity extends AppCompatActivity
                     // @formatter:on
 
                     // band's layout
-                    LinearLayout layout = new LinearLayout(AmproidMainActivity.this);
+                    LinearLayout layout = new LinearLayout(MixerMainActivity.this);
                     layout.setOrientation(HORIZONTAL);
                     layout.setLayoutParams(layoutParams);
 
                     // frequency
-                    TextView freq = new TextView(AmproidMainActivity.this);
+                    TextView freq = new TextView(MixerMainActivity.this);
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         freq.setTextAppearance(R.style.TextAppearance_AppCompat_Small);
                     }
@@ -1118,7 +1120,7 @@ public class AmproidMainActivity extends AppCompatActivity
                     }
 
                     // level
-                    SeekBar level = new SeekBar(AmproidMainActivity.this);
+                    SeekBar level = new SeekBar(MixerMainActivity.this);
                     level.setId(1000 + i);
                     level.setLayoutParams(new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT, 1));
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -1213,12 +1215,12 @@ public class AmproidMainActivity extends AppCompatActivity
                 }
 
                 // create list view
-                ListView playlistView = new ListView(AmproidMainActivity.this);
+                ListView playlistView = new ListView(MixerMainActivity.this);
                 playlistView.setPadding(mediaUIValuesCache.sidePadding, Math.round(getResources().getDimension(R.dimen.separation)), mediaUIValuesCache.sidePadding, 0);
                 playlistView.setDivider(null);
 
                 // create adapter that holds playlist's tracks
-                ArrayAdapter<String> playlistAdapter = new ArrayAdapter<>(AmproidMainActivity.this, R.layout.dialog_playlist_item);
+                ArrayAdapter<String> playlistAdapter = new ArrayAdapter<>(MixerMainActivity.this, R.layout.dialog_playlist_item);
                 for(int i = 0; i < playlist.size(); i++) {
                     playlistAdapter.add(String.format(Locale.US, "%d. %s", i + 1, playlist.get(i).getTitle()));
                 }
@@ -1237,7 +1239,7 @@ public class AmproidMainActivity extends AppCompatActivity
                 });
 
                 // build and show dialog
-                AlertDialog.Builder playlistDialogBuilder = new AlertDialog.Builder(AmproidMainActivity.this).setTitle(R.string.tracks).setView(playlistView).setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
+                AlertDialog.Builder playlistDialogBuilder = new AlertDialog.Builder(MixerMainActivity.this).setTitle(R.string.tracks).setView(playlistView).setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
                 {
                     @Override
                     public void onClick(DialogInterface dialog, int which)

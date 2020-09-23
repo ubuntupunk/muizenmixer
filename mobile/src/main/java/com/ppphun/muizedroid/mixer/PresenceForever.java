@@ -1,25 +1,25 @@
 /*
- * This file is part of Amproid
+ * This file is part of MuizeDroid's MuizenMixer
  *
- * Copyright (c) 2019. Peter Papp
+ * Based upon Amproid by Peter Papp
  *
- * Please visit https://github.com/4phun/Amproid for details
+ * Please visit https://github.com/ubuntupunk/ for details
  *
- * Amproid is free software: you can redistribute it and/or modify
+ * Muizedroid is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Amproid is distributed in the hope that it will be useful,
+ * Muizedroid is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Amproid. If not, see http://www.gnu.org/licenses/
+ * along with Muizedroid. If not, see http://www.gnu.org/licenses/
  */
 
-package com.pppphun.amproid;
+package com.ppphun.muizedroid.mixer;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -42,7 +42,7 @@ public class PresenceForever extends Service
 {
 
     private final static int    NOTIFICATION_ID         = 1100;
-    private final static String NOTIFICATION_CHANNEL_ID = "AmproidPresenceForeverNotificationChannel";
+    private final static String NOTIFICATION_CHANNEL_ID = "MixerPresenceForeverNotificationChannel";
 
     private final AutoBroadcastReceiver     autoBroadcastReceiver = new AutoBroadcastReceiver();
     private       NotificationManagerCompat notificationManager   = null;
@@ -63,7 +63,7 @@ public class PresenceForever extends Service
             notificationManager.createNotificationChannel(notificationChannel);
         }
 
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setContentIntent(PendingIntent.getActivity(this, 0, new Intent(this, AmproidMainActivity.class), PendingIntent.FLAG_CANCEL_CURRENT)).setContentText(getString(R.string.persistence_notification)).setContentTitle(getString(R.string.app_name)).setSmallIcon(R.drawable.ic_launcher).setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher)).setOngoing(true).setPriority(Notification.PRIORITY_HIGH).setSound(null).setVisibility(NotificationCompat.VISIBILITY_SECRET);
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setContentIntent(PendingIntent.getActivity(this, 0, new Intent(this, MixerMainActivity.class), PendingIntent.FLAG_CANCEL_CURRENT)).setContentText(getString(R.string.persistence_notification)).setContentTitle(getString(R.string.app_name)).setSmallIcon(R.drawable.ic_launcher).setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher)).setOngoing(true).setPriority(Notification.PRIORITY_HIGH).setSound(null).setVisibility(NotificationCompat.VISIBILITY_SECRET);
 
         startForeground(NOTIFICATION_ID, notificationBuilder.build());
     }
@@ -96,9 +96,9 @@ public class PresenceForever extends Service
         @Override
         public void onReceive(Context context, Intent intent)
         {
-            Intent intentAmproid = new Intent(PresenceForever.this, AmproidService.class);
-            intentAmproid.putExtra("PresenceForever", true);
-            startService(intentAmproid);
+            Intent intentMixer = new Intent(PresenceForever.this, MixerService.class);
+            intentMixer.putExtra("PresenceForever", true);
+            startService(intentMixer);
         }
     }
 }

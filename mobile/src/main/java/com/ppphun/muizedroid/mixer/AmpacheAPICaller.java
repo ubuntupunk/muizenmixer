@@ -1,26 +1,28 @@
 /*
- * This file is part of Amproid
+ * This file is part of Muizedroid's MuizenMixer
  *
- * Copyright (c) 2019. Peter Papp
+ * based upon Ampdroid by
  *
- * Please visit https://github.com/4phun/Amproid for details
+ * Peter Papp
  *
- * Amproid is free software: you can redistribute it and/or modify
+ * Please visit https://github.com/ubuntupunk/muizenmixer for details
+ *
+ * Muizedroid is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Amproid is distributed in the hope that it will be useful,
+ * Muizedroid is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Amproid. If not, see http://www.gnu.org/licenses/
+ * along with Muizedroid. If not, see http://www.gnu.org/licenses/
  */
 
 
-package com.pppphun.amproid;
+package com.ppphun.muizedroid.mixer;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -39,9 +41,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
 
-import static com.pppphun.amproid.Amproid.NETWORK_CONNECT_TIMEOUT;
-import static com.pppphun.amproid.Amproid.NETWORK_READ_TIMEOUT;
-import static com.pppphun.amproid.Amproid.bundleGetString;
+import static com.pppphun.muizedroid.Mixer.NETWORK_CONNECT_TIMEOUT;
+import static com.pppphun.muizedroid.Mixer.NETWORK_READ_TIMEOUT;
+import static com.pppphun.muizedroid.Mixer.bundleGetString;
 
 
 class AmpacheAPICaller
@@ -164,7 +166,7 @@ class AmpacheAPICaller
 
     private void setErrorMessage(int stringResource)
     {
-        errorMessage = Amproid.getAppContext().getString(stringResource);
+        errorMessage = Muizedroid.getAppContext().getString(stringResource);
     }
 
 

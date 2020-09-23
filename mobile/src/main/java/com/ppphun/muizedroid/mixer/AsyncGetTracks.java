@@ -1,26 +1,28 @@
 /*
- * This file is part of Amproid
+ * This file is part of Muizedroid's MuizenMixer
  *
- * Copyright (c) 2019. Peter Papp
+ * based upon Amproid by
  *
- * Please visit https://github.com/4phun/Amproid for details
+ * Peter Papp
  *
- * Amproid is free software: you can redistribute it and/or modify
+ * Please visit https://github.com/ubuntupunk/muizenmixer for details
+ *
+ * Muizedroid is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Amproid is distributed in the hope that it will be useful,
+ * Muizedroid is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Amproid. If not, see http://www.gnu.org/licenses/
+ * along with Muizedroid. If not, see http://www.gnu.org/licenses/
  */
 
 
-package com.pppphun.amproid;
+package com.ppphun.muizedroid.mixer;
 
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -34,14 +36,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-import static com.pppphun.amproid.Amproid.ConnectionStatus.CONNECTION_NONE;
-import static com.pppphun.amproid.Amproid.ConnectionStatus.CONNECTION_UNKNOWN;
-import static com.pppphun.amproid.AmproidService.PLAY_MODE_ALBUM;
-import static com.pppphun.amproid.AmproidService.PLAY_MODE_BROWSE;
-import static com.pppphun.amproid.AmproidService.PLAY_MODE_PLAYLIST;
-import static com.pppphun.amproid.AmproidService.PLAY_MODE_RANDOM;
-import static com.pppphun.amproid.AmproidService.PREFIX_ARTIST;
-import static com.pppphun.amproid.AmproidService.PREFIX_SONG;
+import static com.pppphun.muizedroid.Mixer.ConnectionStatus.CONNECTION_NONE;
+import static com.pppphun.muizedroid.Mixer.ConnectionStatus.CONNECTION_UNKNOWN;
+import static com.pppphun.muizedroid.MixerService.PLAY_MODE_ALBUM;
+import static com.pppphun.muizedroid.MixerService.PLAY_MODE_BROWSE;
+import static com.pppphun.muizedroid.MixerService.PLAY_MODE_PLAYLIST;
+import static com.pppphun.muizedroid.MixerService.PLAY_MODE_RANDOM;
+import static com.pppphun.muizedroid.MixerService.PREFIX_ARTIST;
+import static com.pppphun.muizedroid.MixerService.PREFIX_SONG;
 
 
 public class AsyncGetTracks extends AsyncTask<Void, Void, Vector<Track>>
@@ -86,25 +88,25 @@ public class AsyncGetTracks extends AsyncTask<Void, Void, Vector<Track>>
     {
         // just to be on the safe side
         if ((authToken == null) || authToken.isEmpty()) {
-            errorMessage = Amproid.getAppContext().getString(R.string.error_blank_token);
+            errorMessage = Mixer.getAppContext().getString(R.string.error_blank_token);
             return new Vector<>();
         }
         if ((url == null) || url.isEmpty()) {
-            errorMessage = Amproid.getAppContext().getString(R.string.error_invalid_server_url);
+            errorMessage = Mixer.getAppContext().getString(R.string.error_invalid_server_url);
             return new Vector<>();
         }
 
         // can't do anything without network connection
         long                     checkStart       = System.currentTimeMillis();
-        Amproid.ConnectionStatus connectionStatus = Amproid.getConnectionStatus();
+        Mixer.ConnectionStatus connectionStatus = Mixer.getConnectionStatus();
         while (!isCancelled() && ((connectionStatus == CONNECTION_UNKNOWN) || (connectionStatus == CONNECTION_NONE))) {
             Intent intent = new Intent();
             intent.putExtra("elapsedMS", System.currentTimeMillis() - checkStart);
-            Amproid.sendLocalBroadcast(R.string.async_no_network_broadcast_action, intent);
+            Mixer.sendLocalBroadcast(R.string.async_no_network_broadcast_action, intent);
 
             SystemClock.sleep(1000);
 
-            connectionStatus = Amproid.getConnectionStatus();
+            connectionStatus = Mixer.getConnectionStatus();
         }
 
         // instantiate Ampache API interface - this handles network operations and XML parsing
@@ -161,8 +163,8 @@ public class AsyncGetTracks extends AsyncTask<Void, Void, Vector<Track>>
             results.add(
                     new MediaBrowserCompat.MediaItem(
                             new MediaDescriptionCompat.Builder()
-                                    .setMediaId(Amproid.getAppContext().getString(R.string.item_root_id))
-                                    .setTitle(Amproid.getAppContext().getString(R.string.item_root_desc))
+                                    .setMediaId(Mixer.getAppContext().getString(R.string.item_root_id))
+                                    .setTitle(Mixer.getAppContext().getString(R.string.item_root_desc))
                                     .build(),
                             MediaBrowserCompat.MediaItem.FLAG_BROWSABLE
                     )
@@ -173,7 +175,7 @@ public class AsyncGetTracks extends AsyncTask<Void, Void, Vector<Track>>
                 results.add(
                         new MediaBrowserCompat.MediaItem(
                                 new MediaDescriptionCompat.Builder()
-                                        .setMediaId(Amproid.getAppContext().getString(R.string.item_root_id))
+                                        .setMediaId(Mixer.getAppContext().getString(R.string.item_root_id))
                                         .setTitle(errorMessage).build(),
                                 MediaBrowserCompat.MediaItem.FLAG_BROWSABLE
                         )
@@ -186,7 +188,7 @@ public class AsyncGetTracks extends AsyncTask<Void, Void, Vector<Track>>
                     new MediaBrowserCompat.MediaItem(
                             new MediaDescriptionCompat.Builder()
                                     .setMediaId(PREFIX_ARTIST + artistAmpacheId)
-                                    .setTitle(Amproid.getAppContext().getString(R.string.up_one_level_songs))
+                                    .setTitle(Mixer.getAppContext().getString(R.string.up_one_level_songs))
                                     .build(),
                             MediaBrowserCompat.MediaItem.FLAG_BROWSABLE
                     )
@@ -224,8 +226,8 @@ public class AsyncGetTracks extends AsyncTask<Void, Void, Vector<Track>>
                 results.add(
                         new MediaBrowserCompat.MediaItem(
                                 new MediaDescriptionCompat.Builder()
-                                        .setMediaId(Amproid.getAppContext().getString(R.string.item_root_id))
-                                        .setTitle(String.format(Amproid.getAppContext().getString(R.string.error_defective_tracks), defective))
+                                        .setMediaId(Mixer.getAppContext().getString(R.string.item_root_id))
+                                        .setTitle(String.format(Mixer.getAppContext().getString(R.string.error_defective_tracks), defective))
                                         .build(),
                                 MediaBrowserCompat.MediaItem.FLAG_BROWSABLE
                         )
@@ -236,8 +238,8 @@ public class AsyncGetTracks extends AsyncTask<Void, Void, Vector<Track>>
             // send it back to the media browser service and we're done
             resultToSend.sendResult(results);
 
-            // for AmproidService to update position
-            Amproid.sendLocalBroadcast(R.string.async_finished_broadcast_action, null);
+            // for MixerService to update position
+            Mixer.sendLocalBroadcast(R.string.async_finished_broadcast_action, null);
 
             return;
         }
@@ -245,9 +247,9 @@ public class AsyncGetTracks extends AsyncTask<Void, Void, Vector<Track>>
         // not called from onLoadChildren, send IPC with results to our service
 
         final Intent intent = new Intent();
-        intent.putExtra(Amproid.getAppContext().getString(R.string.async_finished_broadcast_type), Amproid.getAppContext().getResources().getInteger(R.integer.async_get_tracks));
+        intent.putExtra(Mixer.getAppContext().getString(R.string.async_finished_broadcast_type), Mixer.getAppContext().getResources().getInteger(R.integer.async_get_tracks));
         intent.putExtra("tracks", tracks);
         intent.putExtra("errorMessage", errorMessage);
-        Amproid.sendLocalBroadcast(R.string.async_finished_broadcast_action, intent);
+        Mixer.sendLocalBroadcast(R.string.async_finished_broadcast_action, intent);
     }
 }
